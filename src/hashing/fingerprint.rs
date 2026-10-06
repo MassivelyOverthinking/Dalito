@@ -12,6 +12,7 @@ pub struct DatasetFingerprint {
     schema_hash: HashContent,
     content_hash: HashContent,
     metadata_hash: HashContent,
-    memory_size: f32,
-    row_counts: u32,
+
+    memory_size: u64,
+    row_count: u64,
 }

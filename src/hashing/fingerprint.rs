@@ -2,12 +2,15 @@
 // IMPORTS & MODULES
 //====================================================================================
 
+use serde::{Deserialize, Serialize};
+
 use crate::utility::types::HashContent;
 
 //====================================================================================
 // DATASET FINGERPRINT
 //====================================================================================
 
+#[derive(Debug, Deserialize, Serialize)]
 pub struct DatasetFingerprint {
     schema_hash: HashContent,
     content_hash: HashContent,

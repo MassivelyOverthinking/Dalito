@@ -3,6 +3,7 @@
 //====================================================================================
 
 use std::time::{Duration, SystemTime};
+use std::fmt::Display;
 
 use uuid::Uuid;
 
@@ -16,6 +17,7 @@ use crate::summary::result::{InputResult, OutputResult, TransformationResult};
 pub struct DataLineage<'a> {
     name: String,
     entries: Vec<LineageEntry<'a>>,
+    inputs: Vec<InputResult<'a>>,
     count: u8,
 }
 
@@ -24,6 +26,7 @@ impl<'a> DataLineage<'a> {
         Self {
             name: name,
             entries: Vec::new(),
+            inputs: Vec::new(),
             count: 0,
         }
     }
@@ -89,7 +92,28 @@ impl<'a> LineageEntry<'a> {
     }
 
     fn calculate_duration(input: &SystemTime, output: &SystemTime) -> Duration {
-        let duration_ms = output.duration_since(*input).unwrap();
-        return duration_ms;
+        output.duration_since(*input).unwrap()
+    }
+}
+
+impl<'a> Display for LineageEntry<'a> {
+    fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
+        writeln!(f, "Lineage Entry")?;
+        writeln!(f, "-----------------------------")?;
+        writeln!(f, "ID:                {}", self.entry_id)?;
+        writeln!(f, "Name:              {}", self.name.unwrap_or("None"))?;
+        writeln!(f, "Duration:          {:?}", self.durations_ms)?;
+        writeln!(f, "Input:             {}", self.input)?;
+        writeln!(f, "Output:            {}", self.output)?;
+        writeln!(
+            f, 
+            "Transformation:    {}", 
+            self.transformation
+                .as_ref()
+                .map(|transform| transform.to_string())
+                .unwrap_or_else(|| "None".to_string())
+            )?;
+
+        Ok(())
     }
 }

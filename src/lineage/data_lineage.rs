@@ -8,6 +8,7 @@ use std::fmt::Display;
 use uuid::Uuid;
 
 use crate::summary::result::{InputResult, OutputResult, TransformationResult, ActiveTransformation};
+use crate::error::DalitoError;
 
 //====================================================================================
 // DATA LINEAGE TOOL: Main
@@ -31,8 +32,19 @@ impl<'a> DataLineage<'a> {
         }
     }
 
-    pub fn initiate(&mut self) {
-        todo!()
+    pub fn initiate(&mut self, input: InputResult<'a>, transformation: Option<TransformationResult<'a>>) -> Result<(), DalitoError> {
+        if self.active.is_none() {
+            return Err(DalitoError::interrupted_transformation(
+                "Active transformation in progress cannot be terminated - Try '.finish()' method"
+            ));
+        };
+
+        self.active = Some(ActiveTransformation::new(
+            input, 
+            transformation
+        ));
+
+        Ok(())
     }
 
     pub fn finish(&mut self) {

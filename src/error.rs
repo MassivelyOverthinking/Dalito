@@ -55,7 +55,7 @@ impl fmt::Display for DalitoError{
             Self::InvalidFormat { message} => 
             write!(f, "Invalid data format {}", message),
             Self::InterruptedTransformation { message } =>
-            write!(f, "Active transformation cannot be interrupted {}", message),
+            write!(f, "Inturrpted transformation error {}", message),
         }
     }
 }

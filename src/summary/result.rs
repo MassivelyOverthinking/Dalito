@@ -64,6 +64,25 @@ impl<'a> Display for TransformationResult<'a> {
     }
 }
 
+#[derive(Debug)]
+pub struct ActiveTransformation<'a> {
+    name: &'a str,
+    input: InputResult<'a>,
+    transformation: Option<TransformationResult<'a>>,
+    started_at: SystemTime,
+}
+
+impl<'a> ActiveTransformation<'a> {
+    fn new(name: &'a str, input: InputResult<'a>, transformation: Option<TransformationResult<'a>>) -> Self {
+        Self { 
+            name: name, 
+            input: input, 
+            transformation: transformation, 
+            started_at: SystemTime::now(), 
+        }
+    }
+}
+
 //====================================================================================
 // DATA SUMMARY: Data Entries
 //====================================================================================

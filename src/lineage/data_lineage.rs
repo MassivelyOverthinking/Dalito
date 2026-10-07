@@ -7,7 +7,7 @@ use std::fmt::Display;
 
 use uuid::Uuid;
 
-use crate::summary::result::{InputResult, OutputResult, TransformationResult};
+use crate::summary::result::{InputResult, OutputResult, TransformationResult, ActiveTransformation};
 
 //====================================================================================
 // DATA LINEAGE TOOL: Main
@@ -17,7 +17,7 @@ use crate::summary::result::{InputResult, OutputResult, TransformationResult};
 pub struct DataLineage<'a> {
     name: String,
     entries: Vec<LineageEntry<'a>>,
-    inputs: Vec<InputResult<'a>>,
+    active: Option<ActiveTransformation<'a>>,
     count: u8,
 }
 
@@ -26,7 +26,7 @@ impl<'a> DataLineage<'a> {
         Self {
             name: name,
             entries: Vec::new(),
-            inputs: Vec::new(),
+            active: None,
             count: 0,
         }
     }

@@ -12,14 +12,20 @@ use std::error::Error;
 #[derive(Debug, Clone, PartialEq, Eq, Hash)]
 pub enum DalitoErrorType {
     InvalidFormat,
+    InterruptedTransformation,
 }
 
 #[derive(Debug, Clone, PartialEq)]
-pub enum DalitoError {          // Simple Error with custom messaging
-    // Input validation errors for public API boundaries.
+pub enum DalitoError {          
+    // Input Formatting error ==> Data file formatting is not supported.
     InvalidFormat {
-        format: &'static str,
+        message: &'static str,
     },
+
+    // Transformation error ==> A lineage transformation is actively being recorded and cannot be interrupted.
+    InterruptedTransformation {
+        message: &'static str,
+    }
 }
 
 impl DalitoError {
@@ -27,12 +33,18 @@ impl DalitoError {
     pub fn kind(&self) -> DalitoErrorType {
         match self {
             DalitoError::InvalidFormat { .. } => DalitoErrorType::InvalidFormat,
+            DalitoError::InterruptedTransformation { .. } => DalitoErrorType::InterruptedTransformation,
         }
     }
 
     #[inline]
-    pub fn invalid_format(format: &'static str) -> Self {
-        DalitoError::InvalidFormat { format }
+    pub fn invalid_format(message: &'static str) -> Self {
+        DalitoError::InvalidFormat { message }
+    }
+
+    #[inline]
+    pub fn interrupted_transformation(message: &'static str) -> Self {
+        DalitoError::InterruptedTransformation { message }
     }
 }
 
@@ -40,8 +52,10 @@ impl DalitoError {
 impl fmt::Display for DalitoError{
     fn fmt(&self, f: &mut fmt::Formatter<'_>) -> fmt::Result {
         match self {
-            Self::InvalidFormat { format} => 
-            write!(f, "Invalid data format {}", format),
+            Self::InvalidFormat { message} => 
+            write!(f, "Invalid data format {}", message),
+            Self::InterruptedTransformation { message } =>
+            write!(f, "Active transformation cannot be interrupted {}", message),
         }
     }
 }

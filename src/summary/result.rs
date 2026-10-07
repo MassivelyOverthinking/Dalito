@@ -13,7 +13,7 @@ use crate::{hashing::fingerprint::DatasetFingerprint};
 // DATA SUMMARY: Results
 //====================================================================================
 
-#[derive(Debug, Deserialize, Serialize)]
+#[derive(Debug, Deserialize, Serialize, Clone)]
 pub struct InputResult<'a> {
     timestamp: SystemTime,
     fingerprint: DatasetFingerprint,
@@ -33,7 +33,7 @@ impl<'a> Display for InputResult<'a> {
     }
 }
 
-#[derive(Debug, Deserialize, Serialize)]
+#[derive(Debug, Deserialize, Serialize, Clone, Copy)]
 pub struct OutputResult {
     finished_at: SystemTime,
     fingerprint: DatasetFingerprint,
@@ -51,7 +51,7 @@ impl Display for OutputResult {
     }
 }
 
-#[derive(Debug, Deserialize, Serialize)]
+#[derive(Debug, Deserialize, Serialize, Clone)]
 pub struct TransformationResult<'a> {
     name: &'a str,
     version: &'a str,
@@ -64,7 +64,7 @@ impl<'a> Display for TransformationResult<'a> {
     }
 }
 
-#[derive(Debug)]
+#[derive(Debug, Clone)]
 pub struct ActiveTransformation<'a> {
     name: &'a str, 
     input: InputResult<'a>,
@@ -103,13 +103,13 @@ impl<'a> ActiveTransformation<'a> {
 // DATA SUMMARY: Data Entries
 //====================================================================================
 
-#[derive(Debug, Deserialize, Serialize)]
+#[derive(Debug, Deserialize, Serialize, Clone, Copy)]
 struct ColumnEntry<'a> {
     name: &'a str,
     dtype: &'a str,
 }
 
-#[derive(Debug, Deserialize, Serialize)]
+#[derive(Debug, Deserialize, Serialize, Clone, Copy)]
 struct ParameterEntry<'a> {
     name: &'a str,
     dtype: &'a str,

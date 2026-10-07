@@ -70,7 +70,7 @@ impl<'a> DataLineage<'a> {
     }
 
     pub fn history(&self) -> Result<Vec<LineageEntry<'a>>, ()> {
-        Ok(self.entries.clone());
+        Ok(self.entries.clone())
     }
 
     pub fn transformations(&self) -> Result<Vec<TransformationResult<'a>>, ()> {
@@ -99,7 +99,7 @@ impl<'a> DataLineage<'a> {
 // DATA LINEAGE TOOL: Lineage Entry
 //====================================================================================
 
-#[derive(Debug)]
+#[derive(Debug, Clone)]
 pub struct LineageEntry<'a> {
     entry_id: Uuid,
     name: Option<&'a str>,

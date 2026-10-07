@@ -2,20 +2,11 @@
 // IMPORTS & MODULES
 //====================================================================================
 
-use serde::{Deserialize, Serialize};
-
-use crate::utility::types::HashContent;
-
 //====================================================================================
-// DATASET FINGERPRINT
+// DALITO UTILITY METHODS
 //====================================================================================
 
-#[derive(Debug, Deserialize, Serialize, Clone, Copy)]
-pub struct DatasetFingerprint {
-    schema_hash: HashContent,
-    content_hash: HashContent,
-    metadata_hash: HashContent,
-
-    memory_size: u64,
-    row_count: u64,
+pub fn generate_id() -> String {
+    let bytes: [u8; 8] = rand::random();
+    hex::encode(bytes)
 }

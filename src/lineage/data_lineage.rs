@@ -32,7 +32,7 @@ impl<'a> DataLineage<'a> {
         }
     }
 
-    pub fn initiate(&mut self, input: InputResult<'a>, transformation: Option<TransformationResult<'a>>) -> Result<(), DalitoError> {
+    pub fn initiate(&mut self, name: &'a str, input: InputResult<'a>, transformation: TransformationResult<'a>) -> Result<(), DalitoError> {
         if self.active.is_none() {
             return Err(DalitoError::interrupted_transformation(
                 "Active transformation in progress cannot be terminated - Try '.finish()' method"
@@ -40,6 +40,7 @@ impl<'a> DataLineage<'a> {
         };
 
         self.active = Some(ActiveTransformation::new(
+            name, 
             input, 
             transformation
         ));
@@ -47,12 +48,29 @@ impl<'a> DataLineage<'a> {
         Ok(())
     }
 
-    pub fn finish(&mut self) {
-        todo!()
+    pub fn finish(&mut self, output: OutputResult) -> Result<(), DalitoError> {
+        let active = self.active.take().ok_or(
+            DalitoError::no_active_transformation(
+                "No active transformation record currently found"
+            )
+        )?;
+
+        let entry = LineageEntry::new(
+            *active.get_name(),
+            *active.get_input(),
+            output,
+            *active.get_transformation(),
+            *active.get_started_at(),
+            *output.get_finished_at(),
+        );
+
+        self.add_entry(entry);
+
+        Ok(())
     }
 
     pub fn history(&self) -> Result<Vec<LineageEntry<'a>>, ()> {
-        todo!()
+        Ok(self.entries.clone());
     }
 
     pub fn transformations(&self) -> Result<Vec<TransformationResult<'a>>, ()> {
@@ -85,18 +103,29 @@ impl<'a> DataLineage<'a> {
 pub struct LineageEntry<'a> {
     entry_id: Uuid,
     name: Option<&'a str>,
-    durations_ms: Duration,
+    started_at: SystemTime,
+    finished_at: SystemTime,
+    duration: Duration,
     input: InputResult<'a>,
     output: OutputResult,
-    transformation: Option<TransformationResult<'a>>,
+    transformation: TransformationResult<'a>,
 }
 
 impl<'a> LineageEntry<'a> {
-    pub fn new(name: Option<&'a str>, input: InputResult<'a>, output: OutputResult, transformation: Option<TransformationResult<'a>>) -> Self {
+    pub fn new(
+        name: Option<&'a str>, 
+        input: InputResult<'a>,
+        output: OutputResult, 
+        transformation: TransformationResult<'a>,
+        started_at: SystemTime,
+        finished_at: SystemTime,
+    ) -> Self {
         Self { 
             entry_id: Uuid::new_v4(),
             name: name,
-            durations_ms: Self::calculate_duration(input.get_timestamp(), output.get_timestamp()), 
+            started_at: started_at,
+            finished_at: finished_at,
+            duration: Self::calculate_duration(&started_at, &finished_at), 
             input: input, 
             output: output, 
             transformation: transformation, 
@@ -114,17 +143,10 @@ impl<'a> Display for LineageEntry<'a> {
         writeln!(f, "-----------------------------")?;
         writeln!(f, "ID:                {}", self.entry_id)?;
         writeln!(f, "Name:              {}", self.name.unwrap_or("None"))?;
-        writeln!(f, "Duration:          {:?}", self.durations_ms)?;
+        writeln!(f, "Duration:          {:?}", self.duration)?;
         writeln!(f, "Input:             {}", self.input)?;
         writeln!(f, "Output:            {}", self.output)?;
-        writeln!(
-            f, 
-            "Transformation:    {}", 
-            self.transformation
-                .as_ref()
-                .map(|transform| transform.to_string())
-                .unwrap_or_else(|| "None".to_string())
-            )?;
+        writeln!(f, "Transformation:    {}", self.transformation)?;
 
         Ok(())
     }

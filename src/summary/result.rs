@@ -35,13 +35,13 @@ impl<'a> Display for InputResult<'a> {
 
 #[derive(Debug, Deserialize, Serialize)]
 pub struct OutputResult {
-    timestamp: SystemTime,
+    finished_at: SystemTime,
     fingerprint: DatasetFingerprint,
 }
 
 impl OutputResult {
-    pub fn get_timestamp(&self) -> &SystemTime {
-        &self.timestamp
+    pub fn get_finished_at(&self) -> &SystemTime {
+        &self.finished_at
     }
 }
 
@@ -66,18 +66,36 @@ impl<'a> Display for TransformationResult<'a> {
 
 #[derive(Debug)]
 pub struct ActiveTransformation<'a> {
+    name: &'a str, 
     input: InputResult<'a>,
-    transformation: Option<TransformationResult<'a>>,
+    transformation: TransformationResult<'a>,
     started_at: SystemTime,
 }
 
 impl<'a> ActiveTransformation<'a> {
-    pub fn new(input: InputResult<'a>, transformation: Option<TransformationResult<'a>>) -> Self {
+    pub fn new(name: &'a str, input: InputResult<'a>, transformation: TransformationResult<'a>) -> Self {
         Self {  
+            name: name,
             input: input, 
             transformation: transformation, 
             started_at: SystemTime::now(), 
         }
+    }
+
+    pub fn get_name(&self) -> &'a str {
+        &self.name
+    }
+
+    pub fn get_input(&self) -> &InputResult<'a> {
+        &self.input
+    }
+
+    pub fn get_started_at(&self) -> &SystemTime {
+        &self.started_at
+    }
+
+    pub fn get_transformation(&self) -> &TransformationResult<'a> {
+        &self.transformation
     }
 }
 
